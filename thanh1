@@ -1,0 +1,120 @@
+using System;
+using System.Collections.Generic;
+
+// Lớp cha Person
+class Person
+{
+    public string Id { get; set; }
+    public string FullName { get; set; }
+    public string Gender { get; set; }
+    public int Age { get; set; }
+}
+
+// Lớp con Student kế thừa từ lớp Person
+class Student : Person
+{
+    public double[] Marks { get; set; }
+
+    // Phương thức tính điểm trung bình
+    public double CalculateAverageMark()
+    {
+        double sum = 0;
+        double totalCoefficient = 0;
+
+        // Hệ số môn học
+        double[] coefficients = new double[] { 1, 2, 3, 4, 5 }; // Ví dụ: 5 môn học
+
+        // Tính tổng điểm và tổng hệ số
+        for (int i = 0; i < Marks.Length; i++)
+        {
+            sum += Marks[i] * coefficients[i];
+            totalCoefficient += coefficients[i];
+        }
+
+        // Tính điểm trung bình
+        double averageMark = sum / totalCoefficient;
+        return averageMark;
+    }
+
+    // Phương thức xác định học lực
+    public string DetermineAcademicRank()
+    {
+        double averageMark = CalculateAverageMark();
+        if (averageMark >= 8)
+        {
+            return "Giỏi";
+        }
+        else if (averageMark >= 7)
+        {
+            return "Khá";
+        }
+        else if (averageMark >= 6)
+        {
+            return "Trung bình khá";
+        }
+        else if (averageMark >= 5)
+        {
+            return "Trung bình";
+        }
+        else
+        {
+            return "Yếu";
+        }
+    }
+}
+
+class Program
+{
+    static void Main(string[] args)
+    {
+        // Nhập danh sách gồm 5 sinh viên của lớp
+        List<Student> students = new List<Student>();
+        for (int i = 0; i < 5; i++)
+        {
+            Console.WriteLine("Nhập thông tin cho sinh viên thứ {0}:", i + 1);
+            Student student = new Student();
+
+            // Tự động tạo mã sinh viên
+            student.Id = "CD-CNTT16B" + (i + 1).ToString("D2");
+
+            Console.Write("Họ tên: ");
+            student.FullName = Console.ReadLine();
+
+            Console.Write("Giới tính: ");
+            student.Gender = Console.ReadLine();
+
+            Console.Write("Tuổi: ");
+            student.Age = int.Parse(Console.ReadLine());
+
+            student.Marks = new double[5];
+
+            for (int j = 0; j < 5; j++)
+            {
+                Console.Write("Điểm môn {0}: ", j + 1);
+                student.Marks[j] = double.Parse(Console.ReadLine());
+            }
+
+            students.Add(student);
+        }
+
+        // Sắp xếp danh sách sinh viên theo chiều giảm dần của điểm trung bình
+        students.Sort((x, y) => y.CalculateAverageMark().CompareTo(x.CalculateAverageMark()));
+
+        Console.WriteLine("\nDanh sách sinh viên sau khi sắp xếp:");
+        foreach (var student in students)
+        {
+            Console.WriteLine("Mã SV: {0}, Họ tên: {1}, Điểm TB: {2}, Học lực: {3}",
+                student.Id, student.FullName, student.CalculateAverageMark().ToString("F2"), student.DetermineAcademicRank());
+        }
+
+        // Danh sách sinh viên phải học lại môn 1 (môn đầu tiên)
+        Console.WriteLine("\nDanh sách sinh viên cần học lại môn 1:");
+        foreach (var student in students)
+        {
+            if (student.Marks[0] < 5)
+            {
+                Console.WriteLine("Mã SV: {0}, Họ tên: {1}", student.Id, student.FullName);
+            }
+        }
+    }
+}
