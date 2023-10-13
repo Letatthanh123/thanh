@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 
-// Lớp cha Person
 class Person
 {
     public string Id { get; set; }
@@ -10,56 +9,38 @@ class Person
     public int Age { get; set; }
 }
 
-// Lớp con Student kế thừa từ lớp Person
 class Student : Person
 {
-    public double[] Marks { get; set; }
+    public double[] Grades { get; set; }
 
-    // Phương thức tính điểm trung bình
-    public double CalculateAverageMark()
+    public double TinhDiem(double[] weights)
     {
-        double sum = 0;
-        double totalCoefficient = 0;
+        double totalGrade = 0;
+        double totalWeight = 0;
 
-        // Hệ số môn học
-        double[] coefficients = new double[] { 1, 2, 3, 4, 5 }; // Ví dụ: 5 môn học
-
-        // Tính tổng điểm và tổng hệ số
-        for (int i = 0; i < Marks.Length; i++)
+        for (int i = 0; i < Grades.Length; i++)
         {
-            sum += Marks[i] * coefficients[i];
-            totalCoefficient += coefficients[i];
+            totalGrade += Grades[i] * weights[i];
+            totalWeight += weights[i];
         }
 
-        // Tính điểm trung bình
-        double averageMark = sum / totalCoefficient;
-        return averageMark;
+        return totalGrade / totalWeight;
     }
 
-    // Phương thức xác định học lực
-    public string DetermineAcademicRank()
+    public string HocLuc()
     {
-        double averageMark = CalculateAverageMark();
-        if (averageMark >= 8)
-        {
+        double Diem = TinhDiem(new double[] { 1, 1, 1 }); // assuming equal weights for all subjects
+
+        if (Diem >= 8)
             return "Giỏi";
-        }
-        else if (averageMark >= 7)
-        {
+        else if (Diem >= 7)
             return "Khá";
-        }
-        else if (averageMark >= 6)
-        {
-            return "Trung bình khá";
-        }
-        else if (averageMark >= 5)
-        {
-            return "Trung bình";
-        }
+        else if (Diem >= 6)
+            return "TB Khá";
+        else if (Diem >= 5)
+            return "TB";
         else
-        {
             return "Yếu";
-        }
     }
 }
 
@@ -67,53 +48,52 @@ class Program
 {
     static void Main(string[] args)
     {
-        // Nhập danh sách gồm 5 sinh viên của lớp
         List<Student> students = new List<Student>();
+
+        // Nhập danh sách gồm 5 sinh viên
         for (int i = 0; i < 5; i++)
         {
-            Console.WriteLine("Nhập thông tin cho sinh viên thứ {0}:", i + 1);
             Student student = new Student();
 
-            // Tự động tạo mã sinh viên
-            student.Id = "CD-CNTT16B" + (i + 1).ToString("D2");
-
-            Console.Write("Họ tên: ");
+            Console.WriteLine($"Nhập thông tin sinh viên thứ {i + 1}:");
+            Console.Write("Mã sinh viên: ");
+            student.Id = Console.ReadLine();
+            Console.Write("Họ và tên: ");
             student.FullName = Console.ReadLine();
-
             Console.Write("Giới tính: ");
             student.Gender = Console.ReadLine();
-
             Console.Write("Tuổi: ");
             student.Age = int.Parse(Console.ReadLine());
 
-            student.Marks = new double[5];
+            student.Grades = new double[3]; // assuming 3 subjects
 
-            for (int j = 0; j < 5; j++)
+            for (int j = 0; j < student.Grades.Length; j++)
             {
-                Console.Write("Điểm môn {0}: ", j + 1);
-                student.Marks[j] = double.Parse(Console.ReadLine());
+                Console.Write($"Nhập điểm môn {j + 1}: ");
+                student.Grades[j] = double.Parse(Console.ReadLine());
             }
 
             students.Add(student);
         }
 
         // Sắp xếp danh sách sinh viên theo chiều giảm dần của điểm trung bình
-        students.Sort((x, y) => y.CalculateAverageMark().CompareTo(x.CalculateAverageMark()));
+        students.Sort((s1, s2) => s2.TinhDiem(new double[] { 1, 1, 1 }).CompareTo(s1.TinhDiem(new double[] { 1, 1, 1 })));
 
-        Console.WriteLine("\nDanh sách sinh viên sau khi sắp xếp:");
-        foreach (var student in students)
+        Console.WriteLine("\nDanh sách sinh viên sau khi sắp xếp theo điểm trung bình:");
+
+        foreach (Student student in students)
         {
-            Console.WriteLine("Mã SV: {0}, Họ tên: {1}, Điểm TB: {2}, Học lực: {3}",
-                student.Id, student.FullName, student.CalculateAverageMark().ToString("F2"), student.DetermineAcademicRank());
+            Console.WriteLine($"Mã SV: {student.Id}, Họ tên: {student.FullName}, Điểm TB: {student.TinhDiem(new double[] { 1, 1, 1 })}, Học lực: {student.HocLuc()}");
         }
 
-        // Danh sách sinh viên phải học lại môn 1 (môn đầu tiên)
-        Console.WriteLine("\nDanh sách sinh viên cần học lại môn 1:");
-        foreach (var student in students)
+        // Chỉ ra danh sách sinh viên phải học lại môn 1
+        Console.WriteLine("\nDanh sách sinh viên phải học lại môn 1:");
+
+        foreach (Student student in students)
         {
-            if (student.Marks[0] < 5)
+            if (student.Grades[0] < 5)
             {
-                Console.WriteLine("Mã SV: {0}, Họ tên: {1}", student.Id, student.FullName);
+                Console.WriteLine($"Mã SV: {student.Id}, Họ tên: {student.FullName}");
             }
         }
     }
